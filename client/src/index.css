@@ -1,0 +1,180 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+/* ============================================================
+   Tailwind v4 CSS-first configuration
+   ============================================================ */
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  /* Hospital brand palette */
+  --color-hospital-50: #eff6ff;
+  --color-hospital-100: #dbeafe;
+  --color-hospital-200: #bfdbfe;
+  --color-hospital-300: #93c5fd;
+  --color-hospital-400: #60a5fa;
+  --color-hospital-500: #3b82f6;
+  --color-hospital-600: #2563eb;
+  --color-hospital-700: #1d4ed8;
+  --color-hospital-800: #1e40af;
+  --color-hospital-900: #1e3a8a;
+
+  /* Semantic */
+  --color-success: #10b981;
+  --color-success-light: #d1fae5;
+  --color-warning: #f59e0b;
+  --color-warning-light: #fef3c7;
+  --color-danger: #ef4444;
+  --color-danger-light: #fee2e2;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+  --shadow-card-hover: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  --shadow-sidebar: 4px 0 6px -1px rgb(0 0 0 / 0.08);
+
+  /* Animations */
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-slide-in: slide-in 0.3s ease-out;
+  --animate-pulse-soft: pulse-soft 2s infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-in {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* ============================================================
+   Base Styles
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #f8fafc;
+  color: #0f172a;
+  margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ============================================================
+   Component Styles
+   ============================================================ */
+
+/* Stat Cards */
+.stat-card {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: var(--shadow-card);
+  border: 1px solid #f1f5f9;
+  transition: all 0.2s ease;
+}
+.stat-card:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
+}
+
+/* Data Table */
+.data-table { width: 100%; font-size: 0.875rem; text-align: left; }
+.data-table th {
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  color: #6b7280;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+.data-table td {
+  padding: 0.75rem 1rem;
+  color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+}
+.data-table tbody tr {
+  transition: background 0.1s;
+  cursor: pointer;
+}
+.data-table tbody tr:hover { background: #eff6ff; }
+
+/* Status Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.badge-waiting { background: #fef3c7; color: #92400e; }
+.badge-in_consultation { background: #dbeafe; color: #1e40af; }
+.badge-completed { background: #d1fae5; color: #065f46; }
+.badge-cancelled { background: #fee2e2; color: #991b1b; }
+.badge-sent_to_pharmacy { background: #ede9fe; color: #5b21b6; }
+.badge-sent_to_ot { background: #e0e7ff; color: #3730a3; }
+.badge-scheduled { background: #e0f2fe; color: #075985; }
+.badge-in_progress { background: #ffedd5; color: #9a3412; }
+
+/* Page Layout */
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.5rem; }
+.page-title { font-size: 1.5rem; font-weight: 700; color: #111827; }
+.page-subtitle { font-size: 0.875rem; color: #6b7280; margin-top: 0.125rem; }
+
+/* Form Elements */
+.form-label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem; }
+.form-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  outline: none;
+  transition: all 0.15s;
+  background: white;
+  color: #111827;
+  font-family: inherit;
+}
+.form-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgb(59 130 246 / 0.15); }
+.form-input::placeholder { color: #9ca3af; }
+.form-select { appearance: none; }
+.form-error { font-size: 0.75rem; color: #ef4444; margin-top: 0.25rem; }
+
+/* Animations */
+.animate-fade-in { animation: var(--animate-fade-in); }
+.animate-slide-in { animation: var(--animate-slide-in); }
+.animate-pulse-soft { animation: var(--animate-pulse-soft); }
+.animation-delay-200 { animation-delay: 200ms; }
+.animation-delay-400 { animation-delay: 400ms; }
+
+/* Print */
+@media print {
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+  body { background: white !important; }
+}
