@@ -16,8 +16,14 @@ const dashboardRoutes = require('./routes/dashboard');
 const adminRoutes = require('./routes/admin');
 const { errorHandler } = require('./middleware/errorHandler');
 
-const app = express();
-const PORT = process.env.PORT || 3001;
+// Root & Health Checks
+app.get('/', (req, res) => {
+  res.json({ status: 'ok', message: 'Akshara Eye Hospital & Opticals API running successfully' });
+});
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', service: 'Akshara Eye Hospital API', timestamp: new Date().toISOString() });
+});
 
 // Security
 app.use(helmet({ crossOriginResourcePolicy: false }));
