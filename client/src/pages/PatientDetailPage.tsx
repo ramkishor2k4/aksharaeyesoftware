@@ -3,16 +3,18 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   ArrowLeft, User, Phone, MapPin, Calendar, Stethoscope,
-  Scissors, Pill, FileText, Clock, AlertCircle
+  Scissors, Pill, FileText, Clock, AlertCircle, Printer
 } from 'lucide-react';
 import api from '@/lib/api';
 import { Card, LoadingSpinner, Badge, PageHeader, Button } from '@/components/ui';
 import { formatDate, formatDateTime, formatCurrency, getStatusColor, getStatusLabel } from '@/lib/utils';
-import type { PatientHistory } from '@/types';
+import type { PatientHistory, Consultation } from '@/types';
+import { PrescriptionSlipModal } from '@/components/op/PrescriptionSlipModal';
 
 export function PatientDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<'overview' | 'consultations' | 'operations' | 'bills'>('overview');
+  const [selectedConsultation, setSelectedConsultation] = useState<Consultation | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['patient', id],
@@ -164,46 +166,62 @@ export function PatientDetailPage() {
                   <div className="font-semibold text-gray-800">Consultation</div>
                   <div className="text-xs text-gray-400">{formatDateTime(c.created_at)} · Dr. {c.doctor_name || '—'}</div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                   {c.send_to_pharmacy && <span className="badge badge-sent_to_pharmacy">→ Pharmacy</span>}
                   {c.send_to_ot && <span className="badge badge-sent_to_ot">→ OT</span>}
+                  <button
+                    onClick={() => setSelectedConsultation(c)}
+                    className="px-2.5 py-1 text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg flex items-center gap-1 transition-colors"
+                  >
+                    <Printer size={13} /> Print Slip
+                  </button>
                 </div>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">
-                {[
-                  { label: 'Diagnosis', value: c.diagnosis },
-                  { label: 'Chief Complaint', value: c.chief_complaint },
-                  { label: 'Right Eye Vision', value: c.right_eye_vision },
-                  { label: 'Left Eye Vision', value: c.left_eye_vision },
-                  { label: 'Right Eye Power', value: c.right_eye_power },
-                  { label: 'Left Eye Power', value: c.left_eye_power },
-                ].filter(f => f.value).map(f => (
-                  <div key={f.label} className="bg-gray-50 rounded-lg p-2">
-                    <div className="text-xs text-gray-400">{f.label}</div>
-                    <div className="text-sm font-medium text-gray-700">{f.value}</div>
-                  </div>
-                ))}
-              </div>
-              {c.prescribed_medicines?.length > 0 && (
-                <div>
-                  <div className="text-xs font-medium text-gray-500 mb-1">Prescribed Medicines:</div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {c.prescribed_medicines.map((m, i) => (
-                      <span key={i} className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded-lg">
-                        {m.name} — {m.dosage}, {m.frequency}
-                      </span>
-                    ))}
-                  </div>
+                  {[
+                    { label: 'Diagnosis', value: c.diagnosis },
+                    { label: 'Chief Complaint', value: c.chief_complaint },
+                    { label: 'Right Eye Vision', value: c.right_eye_vision },
+                    { label: 'Left Eye Vision', value: c.left_eye_vision },
+                    { label: 'Right Eye Power', value: c.right_eye_power },
+                    { label: 'Left Eye Power', value: c.left_eye_power },
+                  ].filter(f => f.value).map(f => (
+                    <div key={f.label} className="bg-gray-50 rounded-lg p-2">
+                      <div className="text-xs text-gray-400">{f.label}</div>
+                      <div className="text-sm font-medium text-gray-700">{f.value}</div>
+                    </div>
+                  ))}
                 </div>
-              )}
-              {c.follow_up_date && (
-                <div className="mt-2 text-xs text-blue-600 flex items-center gap-1">
-                  <Clock size={11} /> Follow-up: {formatDate(c.follow_up_date)}
-                </div>
-              )}
-            </Card>
-          ))}
+                {c.prescribed_medicines?.length > 0 && (
+                  <div>
+                    <div className="text-xs font-medium text-gray-500 mb-1">Prescribed Medicines:</div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {c.prescribed_medicines.map((m, i) => (
+                        <span key={i} className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded-lg">
+                          {m.name} — {m.dosage}, {m.frequency}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {c.follow_up_date && (
+                  <div className="mt-2 text-xs text-blue-600 flex items-center gap-1">
+                    <Clock size={11} /> Follow-up: {formatDate(c.follow_up_date)}
+                  </div>
+                )}
+              </Card>
+            ))}
         </div>
+      )}
+
+      {selectedConsultation && (
+        <PrescriptionSlipModal
+          isOpen={!!selectedConsultation}
+          onClose={() => setSelectedConsultation(null)}
+          patient={patient}
+          consultation={selectedConsultation}
+          doctorName={selectedConsultation.doctor_name}
+        />
       )}
 
       {activeTab === 'operations' && (

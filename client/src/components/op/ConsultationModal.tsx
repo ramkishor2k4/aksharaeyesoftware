@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { X, Eye, Stethoscope, Pill, Scissors, Plus, Trash2 } from 'lucide-react';
+import { X, Eye, Stethoscope, Pill, Scissors, Plus, Trash2, Printer } from 'lucide-react';
 import api from '@/lib/api';
 import { Button, Input, Textarea, Card, LoadingSpinner } from '@/components/ui';
 import toast from 'react-hot-toast';
 import type { Appointment, Consultation, PrescribedMedicine } from '@/types';
+import { PrescriptionSlipModal } from '@/components/op/PrescriptionSlipModal';
 
 interface Props {
   appointment: Appointment;
@@ -18,6 +19,7 @@ const DURATION_OPTIONS = ['3 days', '5 days', '7 days', '10 days', '14 days', '1
 export function ConsultationModal({ appointment, onClose, onSuccess }: Props) {
   const qc = useQueryClient();
   const [activeSection, setActiveSection] = useState<'vision' | 'clinical' | 'medicines' | 'actions'>('vision');
+  const [showPrintSlip, setShowPrintSlip] = useState(false);
 
   const [form, setForm] = useState({
     right_eye_vision: '', left_eye_vision: '',
@@ -101,7 +103,7 @@ export function ConsultationModal({ appointment, onClose, onSuccess }: Props) {
   const f = (field: string, value: string | boolean) => setForm(prev => ({ ...prev, [field]: value }));
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 no-print">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col animate-fade-in">
         {/* Header */}
@@ -245,8 +247,11 @@ export function ConsultationModal({ appointment, onClose, onSuccess }: Props) {
         )}
 
         {/* Footer Actions */}
-        <div className="flex gap-3 px-6 py-4 border-t border-gray-100 flex-shrink-0 bg-white">
+        <div className="flex gap-2.5 px-6 py-4 border-t border-gray-100 flex-shrink-0 bg-white flex-wrap sm:flex-nowrap">
           <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" icon={<Printer size={14} />} onClick={() => setShowPrintSlip(true)}>
+            Print Slip
+          </Button>
           <Button variant="secondary" loading={mutation.isPending} onClick={() => handleSave()}>
             Save Only
           </Button>
@@ -269,6 +274,51 @@ export function ConsultationModal({ appointment, onClose, onSuccess }: Props) {
           )}
         </div>
       </div>
+
+      {showPrintSlip && (
+        <PrescriptionSlipModal
+          isOpen={showPrintSlip}
+          onClose={() => setShowPrintSlip(false)}
+          patient={{
+            id: appointment.patient_id,
+            patient_id: appointment.patient_code || 'PATIENT',
+            name: appointment.patient_name || 'Patient',
+            age: appointment.age || 0,
+            gender: (appointment.gender as 'Male' | 'Female' | 'Other') || 'Male',
+            mobile: appointment.mobile || '',
+            address: (appointment as any).address || '',
+            village_city: (appointment as any).village_city || '',
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }}
+          consultation={{
+            id: existingData?.consultation?.id || 'new',
+            appointment_id: appointment.id,
+            patient_id: appointment.patient_id,
+            doctor_id: appointment.doctor_id || '',
+            right_eye_vision: form.right_eye_vision,
+            left_eye_vision: form.left_eye_vision,
+            right_eye_power: form.right_eye_power,
+            left_eye_power: form.left_eye_power,
+            right_eye_pressure: form.right_eye_pressure,
+            left_eye_pressure: form.left_eye_pressure,
+            chief_complaint: form.chief_complaint,
+            diagnosis: form.diagnosis,
+            clinical_notes: form.clinical_notes,
+            investigations: form.investigations,
+            prescribed_medicines: medicines,
+            follow_up_date: form.follow_up_date,
+            follow_up_notes: form.follow_up_notes,
+            send_to_pharmacy: form.send_to_pharmacy,
+            send_to_ot: form.send_to_ot,
+            ot_recommendation: form.ot_recommendation,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }}
+          doctorName={appointment.doctor_name}
+        />
+      )}
     </div>
   );
 }

@@ -174,7 +174,65 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Print */
 @media print {
-  .no-print { display: none !important; }
-  .print-only { display: block !important; }
-  body { background: white !important; }
+  .no-print,
+  #root > div > header,
+  #root > div > aside,
+  #root > div > main {
+    display: none !important;
+  }
+
+  body, html, #root {
+    background: white !important;
+    color: black !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Reset fixed modal overlay during print */
+  .prescription-slip-modal-wrapper {
+    position: static !important;
+    background: white !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .prescription-slip-modal-card {
+    position: static !important;
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    animation: none !important;
+    background: white !important;
+  }
+
+  #printable-prescription-slip {
+    display: block !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    visibility: visible !important;
+  }
+
+  #printable-prescription-slip * {
+    visibility: visible !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm;
+  }
 }

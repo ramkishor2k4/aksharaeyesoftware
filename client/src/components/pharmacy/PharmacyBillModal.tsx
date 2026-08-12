@@ -49,13 +49,14 @@ export function PharmacyBillModal({ isOpen, onClose, onSuccess }: Props) {
   }, [medSearch]);
 
   const addMedicine = (med: Medicine) => {
+    const unitPrice = parseFloat(med.selling_price as any) || 0;
     const existing = items.find(i => i.medicine_id === med.id);
     if (existing) {
-      setItems(items.map(i => i.medicine_id === med.id ? { ...i, quantity: i.quantity + 1, total_price: (i.quantity + 1) * i.unit_price } : i));
+      setItems(items.map(i => i.medicine_id === med.id ? { ...i, quantity: i.quantity + 1, total_price: (i.quantity + 1) * i.unit_price * (1 - (i.discount_percent || 0) / 100) } : i));
     } else {
       setItems([...items, {
         medicine_id: med.id, medicine_name: med.name, batch_number: med.batch_number,
-        quantity: 1, unit_price: med.selling_price, total_price: med.selling_price,
+        quantity: 1, unit_price: unitPrice, total_price: unitPrice,
         discount_percent: 0, medicine: med,
       }]);
     }
@@ -71,7 +72,7 @@ export function PharmacyBillModal({ isOpen, onClose, onSuccess }: Props) {
   };
   const removeItem = (idx: number) => setItems(items.filter((_, i) => i !== idx));
 
-  const subtotal = items.reduce((s, i) => s + i.total_price, 0);
+  const subtotal = items.reduce((s, i) => s + (Number(i.total_price) || 0), 0);
   const discountAmt = parseFloat(discount) || 0;
   const total = Math.max(0, subtotal - discountAmt);
 
@@ -232,8 +233,8 @@ export function PharmacyBillModal({ isOpen, onClose, onSuccess }: Props) {
                             className="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-xs font-bold">+</button>
                         </div>
                       </td>
-                      <td className="py-2 text-right text-gray-600">₹{item.unit_price}</td>
-                      <td className="py-2 text-right font-semibold">₹{item.total_price.toFixed(2)}</td>
+                      <td className="py-2 text-right text-gray-600">₹{(Number(item.unit_price) || 0).toFixed(2)}</td>
+                      <td className="py-2 text-right font-semibold">₹{(Number(item.total_price) || 0).toFixed(2)}</td>
                       <td className="py-2 pl-2">
                         <button type="button" onClick={() => removeItem(idx)} className="text-red-400 hover:text-red-600"><Trash2 size={13} /></button>
                       </td>
